@@ -1,0 +1,64 @@
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+
+import Body from './components/Body.js';
+import About from './components/About.js';
+import Contact from './components/Contact.js';
+import Cart from './components/Cart.js';
+import LogIn from './components/LogIn.js';
+import ErrorPage from './components/ErrorPage.js';
+import Admin from './components/Admin/Admin.js';
+import PaymentForm from './components/PaymentForm.js';
+
+import { Provider } from "react-redux";
+import appStore from './store/store.js';
+
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    errorElement: <ErrorPage />,
+
+    children: [
+      {
+        path: "/",
+        element: <Body />
+      },
+      {
+        path: "/about",
+        element: <About />
+      },
+      {
+        path: "/contact",
+        element: <Contact />
+      },
+      {
+        path: "/cart",
+        element: <Cart />
+      },
+      {
+        path: "/login",
+        element: <LogIn />
+      },
+      {
+        path: "/admin",
+        element: <Admin />
+      },
+      {
+
+        path: "/checkout/payment",
+        element: <PaymentForm />
+      }
+    ]
+  }
+]);
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <Provider store={appStore}>
+    <RouterProvider router={router} />
+  </Provider>
+);
