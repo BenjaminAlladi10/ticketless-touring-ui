@@ -1,18 +1,18 @@
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+import '@/index.css';
+import App from '@/App';
 
-import Body from './components/Body.js';
-import About from './components/About.js';
-import Contact from './components/Contact.js';
-import Cart from './components/Cart.js';
-import LogIn from './components/LogIn.js';
-import ErrorPage from './components/ErrorPage.js';
-import Admin from './components/Admin/Admin.js';
-import PaymentForm from './components/PaymentForm.js';
+import Body from '@/components/Body.jsx';
+import About from '@/components/About.jsx';
+import Contact from '@/components/Contact.jsx';
+import Cart from '@/components/Cart.jsx';
+import LogIn from '@/components/LogIn.jsx';
+import ErrorPage from '@/components/ErrorPage.jsx';
+import Admin from '@/components/Admin/Admin.jsx';
+import PaymentForm from '@/components/PaymentForm.jsx';
 
 import { Provider } from "react-redux";
-import appStore from './store/store.js';
+import appStore from '@/store/store.js';
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 

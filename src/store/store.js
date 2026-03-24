@@ -1,6 +1,6 @@
 import {configureStore} from "@reduxjs/toolkit";
-import { cartReducer } from "./cartSlice";
-import { monumentsReducer } from "./monumentsSlice";
+import { cartReducer } from "@/store/cartSlice";
+import { monumentsReducer } from "@/store/monumentsSlice";
 
 const appStore= configureStore({
     reducer:{

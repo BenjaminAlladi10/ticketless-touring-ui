@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import http from "../api/http";
+import http from "@/api/http";
 
 export const fetchMonuments = createAsyncThunk("monuments/fetchMonuments", async () => {
     try {
@@ -10,7 +10,7 @@ export const fetchMonuments = createAsyncThunk("monuments/fetchMonuments", async
     }
 });
 
-const monumentsSlice= createSlice({
+const monumentsSlice = createSlice({
     name: "monuments",
 
     initialState: {
@@ -22,21 +22,20 @@ const monumentsSlice= createSlice({
 
     reducers: {},
 
-    extraReducers: (builder)=>{
+    extraReducers: (builder) => {
         builder
-            .addCase(fetchMonuments.pending, (state, action)=>{
-                state.status= "pending";
+            .addCase(fetchMonuments.pending, (state, action) => {
+                state.status = "pending";
             })
-            .addCase(fetchMonuments.fulfilled, (state, action)=>{
-                state.status= "fulfilled";
-                state.monuments= action.payload;
+            .addCase(fetchMonuments.fulfilled, (state, action) => {
+                state.status = "fulfilled";
+                state.monuments = action.payload;
             })
-            .addCase(fetchMonuments.rejected, (state, action)=>{
-                state.status= "rejected";
-                state.monuments= action.error.message;
+            .addCase(fetchMonuments.rejected, (state, action) => {
+                state.status = "rejected";
+                state.monuments = action.error.message;
             })
     }
 });
 
-export const monumentsReducer= monumentsSlice.reducer;
-export {fetchMonuments};
+export const monumentsReducer = monumentsSlice.reducer;
