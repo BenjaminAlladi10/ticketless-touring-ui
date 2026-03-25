@@ -2,7 +2,24 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { addMonument, getTotals } from '@/store/cartSlice';
 import { toast } from 'react-toastify';
+import { MapPin, IndianRupee, ShoppingCart, Info } from 'lucide-react';
+
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
 
 export default function MonumentCard({ monument }) {
   const { name, image, location, price } = monument;
@@ -16,46 +33,65 @@ export default function MonumentCard({ monument }) {
     toast.success(`Added ${item.quantity} item(s) to Cart`);
   };
 
-  const handleQuantityChange = (e) => {
-    setQuantity(parseInt(e.target.value));
+  const handleQuantityChange = (val) => {
+    setQuantity(parseInt(val));
   };
 
   return (
-    <div className="w-[16rem] bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-500 hover:scale-[1.05] transition-transform">
-      <img className="rounded-[1.2rem] h-44 p-2 mx-auto min-w-[98%] object-cover" src={image} alt={name} />
-    
-      <div className="p-3 pt-0 text-nowrap overflow-clip">
-        <h6 className="mb-1 text-xl font-bold tracking-tight text-black dark:text-white truncate">{name}</h6>
-      
-        <p className="mb-1 font-normal text-[0.95rem] text-gray-700 dark:text-gray-300">
-          <span className='text-gray-800 dark:text-gray-300 font-semibold'>Location:</span> {location}
-        </p>
-
-        <p className="mb-1 font-normal text-[0.95rem] text-gray-700 dark:text-gray-300">
-          <span className='text-gray-800 dark:text-gray-300 font-semibold'>Price:</span> ₹{price}
-        </p>
-
-        <div className="mb-3">
-          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Tickets:</label>
-          <select 
-            onChange={handleQuantityChange} 
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          >
-            {[...Array(10)].map((_, i) => (
-              <option value={i + 1} key={i + 1}>
-                {i + 1}
-              </option>
-            ))}
-          </select>
+    <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-border/50 bg-card/50 backdrop-blur-sm group">
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <img 
+          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" 
+          src={image} 
+          alt={name} 
+        />
+        <div className="absolute top-2 right-2">
+          <Badge variant="secondary" className="font-semibold backdrop-blur-md bg-background/80">
+            <IndianRupee className="w-3 h-3 mr-0.5" />
+            {price}
+          </Badge>
         </div>
+      </div>
+    
+      <CardHeader className="p-4 pb-2">
+        <CardTitle className="text-lg font-bold leading-tight line-clamp-1 group-hover:text-primary transition-colors">
+          {name}
+        </CardTitle>
+        <div className="flex items-center text-sm text-muted-foreground gap-1">
+          <MapPin className="w-3.5 h-3.5 text-primary" />
+          <span className="line-clamp-1">{location}</span>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="p-4 pt-0">
+        <div className="space-y-2 pt-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium text-muted-foreground">Num. of Tickets</label>
+            <Select onValueChange={handleQuantityChange} defaultValue="1">
+              <SelectTrigger className="w-[70px] h-8 text-xs">
+                <SelectValue placeholder="1" />
+              </SelectTrigger>
+              <SelectContent>
+                {[...Array(10)].map((_, i) => (
+                  <SelectItem value={(i + 1).toString()} key={i + 1}>
+                    {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </CardContent>
 
+      <CardFooter className="p-4 pt-0 gap-2">
         <Button 
-          className="w-full"
+          className="flex-1 gap-2 shadow-sm"
           onClick={handleClick}
         >
+          <ShoppingCart className="w-4 h-4" />
           Add to Cart
         </Button>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }
