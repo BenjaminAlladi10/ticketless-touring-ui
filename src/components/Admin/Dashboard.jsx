@@ -1,7 +1,7 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { LayoutDashboard } from 'lucide-react';
 
-export default function Dashboard({setChoice}) {
+export default function Dashboard({setChoice, choice}) {
 
   const [showMonumentOptions, setShowMonumentOptions]= useState(true);
   const [showUserOptions, setShowUserOptions]= useState(true);
@@ -10,41 +10,46 @@ export default function Dashboard({setChoice}) {
   const adminUserOptions= ["All Users"];
 
   return (
-    <div className='overflow-hidden flex flex-col justify-start min-h-[100vh] min-w-[16%] pl-2 bg-gray-50 border-gray-200 dark:bg-gray-900 shadow-md dark:shadow-gray-400'>
-        <h1 className='md:text-[1.5rem] text-[1.2rem] font-bold text-gray-800 dark:text-gray-100 mb-2 border-b-[0px] border-b-solid border-b-slate-500 py-2'>Dashboard</h1>
-
-        <div className='md:text-xl text-lg font-semibold text-gray-800 dark:text-gray-50 pb-2 border-b-[1px] border-b-solid border-b-slate-500 dark:border-b-slate-300 flex md:flex-row flex-col justify-between cursor-pointer' onClick={()=>setShowMonumentOptions(!showMonumentOptions)}>
-            <h2>Monuments</h2>
-            <span className="text-md md:text-xl">
-                {showMonumentOptions?"⬆️":"⬇️"}
-            </span>
+    <div className='flex flex-col justify-start min-h-[calc(100vh-64px)] w-60 md:w-64 p-4 bg-white border-r border-gray-200 dark:bg-gray-900/40 dark:border-gray-800 shadow-sm'>
+        <div className='flex items-center gap-2 mb-8 px-2 py-2 mt-2'>
+            <LayoutDashboard className="w-6 h-6 text-primary" />
+            <h1 className='text-xl font-bold text-gray-900 dark:text-white tracking-tight'>Dashboard</h1>
         </div>
 
-        <ul>
+        <div className='text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 px-3 flex justify-between items-center cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 transition-colors' onClick={()=>setShowMonumentOptions(!showMonumentOptions)}>
+            <h2>Monuments</h2>
+            <span className="text-xs">{showMonumentOptions ? "▲" : "▼"}</span>
+        </div>
+
+        <ul className="mb-8 space-y-1">
         {showMonumentOptions && adminMonumentOptions.map((option) => (
-            <li key={option} className="text-lg hover:bg-gray-400 mx-auto text-center pb-2 border-b border-b-slate-300 dark:border-b-slate-500 dark:hover:bg-gray-700 cursor-pointer" onClick={()=>setChoice(option)}>
+            <li key={option} 
+                className={`px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer text-sm font-medium
+                    ${choice === option 
+                        ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground font-semibold shadow-sm' 
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`} 
+                onClick={()=>setChoice(option)}>
                 {option}
             </li>
         ))}
-
         </ul>
 
-
-
-        <div className='md:text-xl text-lg font-semibold text-gray-800 dark:text-gray-50 pb-2 border-b-[1px] border-b-solid border-b-slate-500 dark:border-b-slate-300 flex md:flex-row flex-col justify-between cursor-pointer mt-8' onClick={()=>setShowUserOptions(!showUserOptions)}>
+        <div className='text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 px-3 flex justify-between items-center cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 transition-colors mt-4' onClick={()=>setShowUserOptions(!showUserOptions)}>
             <h2>Users</h2>
-            <span className="text-md md:text-xl">
-                {showUserOptions?"⬆️":"⬇️"}
-            </span>
+            <span className="text-xs">{showUserOptions ? "▲" : "▼"}</span>
         </div>
 
-        <ul>
+        <ul className="space-y-1">
         {showUserOptions && adminUserOptions.map((option) => (
-            <li key={option} className="text-lg hover:bg-gray-400 mx-auto text-center pb-2 border-b border-b-slate-300 dark:border-b-slate-500 dark:hover:bg-gray-700 cursor-pointer" onClick={()=>setChoice(option)}>
+            <li key={option} 
+                className={`px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer text-sm font-medium
+                    ${choice === option 
+                        ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground font-semibold shadow-sm' 
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`} 
+                onClick={()=>setChoice(option)}>
                 {option}
             </li>
         ))}
-
         </ul>
     </div>
   )

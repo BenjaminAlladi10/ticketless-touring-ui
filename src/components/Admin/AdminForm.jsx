@@ -6,6 +6,7 @@ import MonumentCard from '@/components/MonumentCard';
 import userContext from '@/contexts/userContext';
 import { useMonuments, useAddMonument, useEditMonument, useDeleteMonument, useGetMonument } from '@/hooks/useMonuments';
 import { useUsers, useDeleteUser } from '@/hooks/useUsers';
+import http from '@/api/http';
 
 export default function AdminForm({ choice }) {
     const { data: monuments = [] } = useMonuments();
@@ -93,9 +94,6 @@ export default function AdminForm({ choice }) {
                 res = await deleteMutation.mutateAsync(formData.selectedMonument);
             }
             else if (choice === 'Get') {
-                // For Get, we still use a direct call or a one-off query, but since it's a form submit, mutateAsync is fine if we want, 
-                // but we should probably just fetch it. However, the original code used http.post for Get.
-                // I'll stick to a direct http call for one-off searches if they don't benefit from caching.
                 const response = await http.post("/monuments/getmonument", { _id: formData.selectedMonument });
                 res = response.data;
             }
@@ -132,10 +130,15 @@ export default function AdminForm({ choice }) {
     }
 
     return (
-        <div className='mt-2 mx-auto w-full max-w-4xl'>
-            <h1 className='text-xl md:text-2xl font-bold mb-4 dark:text-white'>
-                {choice} {(choice === "Get All") ? "Monuments" : choice === "All Users" ? "" : "Monument"}
-            </h1>
+        <div className='mx-auto w-full max-w-4xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-6 md:p-8 mt-2'>
+            <div className="mb-8 border-b border-gray-200 dark:border-gray-800 pb-5">
+                <h1 className='text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white flex items-center gap-2'>
+                    {choice} {(choice === "Get All") ? "Monuments" : choice === "All Users" ? "Users" : "Monument"}
+                </h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    Manage your {choice === "All Users" ? "users" : "monument records"} and system settings here.
+                </p>
+            </div>
 
             {choice !== "All Users" && (
                 <form className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-8 mb-8" onSubmit={handleSubmit}>
@@ -196,7 +199,13 @@ export default function AdminForm({ choice }) {
                 </form>
             )}
 
-            {result && choice === "Get" && <MonumentCard monument={result} />}
+            <div className='mt-8 flex justify-center'>
+                {result && choice === "Get" && (
+                    <div className="w-full max-w-[320px]">
+                        <MonumentCard monument={result} />
+                    </div>
+                )}
+            </div>
 
             {choice === "All Users" && (
                 <div className="overflow-x-auto mt-4 mb-4">
@@ -218,9 +227,9 @@ export default function AdminForm({ choice }) {
                                     <td className="px-4 py-4">{user.email}</td>
                                     <td className="px-4 py-4">{new Date(user.createdAt).toLocaleDateString()}</td>
                                     <td className="px-4 py-4">
-                                        <Button 
-                                            variant="destructive" 
-                                            size="sm" 
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
                                             onClick={() => handleDeleteUser(user)}
                                             disabled={loginUser?.username === user.username}
                                         >

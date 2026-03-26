@@ -46,26 +46,25 @@ export default function NavBar() {
 
   const NavLinks = ({ className = "" }) => (
     <div className={`flex items-center space-x-6 ${className}`}>
-      <NavLink to="/" className={({ isActive }) => 
+      <NavLink to="/" className={({ isActive }) =>
         `text-sm font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
       }>
         Home
       </NavLink>
-      <NavLink to="/about" className={({ isActive }) => 
+      <NavLink to="/about" className={({ isActive }) =>
         `text-sm font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
       }>
         About
       </NavLink>
-      <NavLink to="/contact" className={({ isActive }) => 
+      <NavLink to="/contact" className={({ isActive }) =>
         `text-sm font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
       }>
         Contact
       </NavLink>
       {user?.isAdmin && (
-        <NavLink to="/admin" className={({ isActive }) => 
+        <NavLink to="/admin" className={({ isActive }) =>
           `text-sm font-medium transition-colors hover:text-primary flex items-center gap-1 ${isActive ? "text-primary" : "text-muted-foreground"}`
         }>
-          <LayoutDashboard className="w-4 h-4" />
           Admin
         </NavLink>
       )}
@@ -150,17 +149,17 @@ export default function NavBar() {
                 <SheetTitle className="text-left">Menu</SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-4 py-8">
-                <NavLink to="/" className={({ isActive }) => 
+                <NavLink to="/" className={({ isActive }) =>
                   `text-lg font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
                 }>Home</NavLink>
-                <NavLink to="/about" className={({ isActive }) => 
+                <NavLink to="/about" className={({ isActive }) =>
                   `text-lg font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
                 }>About</NavLink>
-                <NavLink to="/contact" className={({ isActive }) => 
+                <NavLink to="/contact" className={({ isActive }) =>
                   `text-lg font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
                 }>Contact</NavLink>
                 {user?.isAdmin && (
-                  <NavLink to="/admin" className={({ isActive }) => 
+                  <NavLink to="/admin" className={({ isActive }) =>
                     `text-lg font-medium transition-colors hover:text-primary flex items-center gap-2 ${isActive ? "text-primary" : "text-muted-foreground"}`
                   }>
                     <LayoutDashboard className="w-5 h-5" /> Admin Dashboard

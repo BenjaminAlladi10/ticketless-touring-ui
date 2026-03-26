@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client';
 import '@/index.css';
 import App from '@/App';
-
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Body from '@/pages/Body.jsx';
 import About from '@/pages/About.jsx';
 import Contact from '@/pages/Contact.jsx';
@@ -15,6 +15,8 @@ import { Provider } from "react-redux";
 import appStore from '@/store/store.js';
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -58,7 +60,9 @@ const router = createBrowserRouter([
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <Provider store={appStore}>
-    <RouterProvider router={router} />
-  </Provider>
+  <QueryClientProvider client={queryClient}>
+    <Provider store={appStore}>
+      <RouterProvider router={router} />
+    </Provider>
+  </QueryClientProvider>
 );

@@ -9,8 +9,8 @@ export default function Body() {
   const { data: monuments, isLoading, isError, error } = useMonuments();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredMonuments = monuments?.filter((monument) => 
-    monument.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredMonuments = monuments?.filter((monument) =>
+    monument.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     monument.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

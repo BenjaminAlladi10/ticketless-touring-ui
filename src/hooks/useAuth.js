@@ -1,5 +1,18 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import http from '@/api/http';
+import { useNavigate } from "react-router-dom";
+
+export const useCurrentUser = () => {
+  return useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const response = await http.get('/users/getcurrentuser');
+      return response.data.data;
+    },
+    retry: false,
+    staleTime: Infinity,
+  });
+};
 
 export const useLogin = () => {
   return useMutation({
@@ -20,10 +33,17 @@ export const useRegister = () => {
 };
 
 export const useLogout = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async () => {
       const response = await http.post('/users/logout');
       return response.data;
     },
+    onSuccess: () => {
+      queryClient.setQueryData(['currentUser'], null);
+      navigate("/");
+    }
   });
 };

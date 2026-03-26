@@ -19,10 +19,12 @@ export default function Admin() {
   const [formData, setFormData]= useState({});
 
   return (
-    <div className="flex dark:text-white">
-        <Dashboard setChoice={setChoice}/>
+    <div className="flex min-h-[calc(100vh-64px)] bg-slate-50 dark:bg-slate-950 dark:text-white">
+        <Dashboard setChoice={setChoice} choice={choice} />
         
-        <AdminForm choice={choice}/>
+        <div className="flex-1 p-4 md:p-8 overflow-y-auto w-full">
+            <AdminForm choice={choice}/>
+        </div>
     </div>
   );
 }
