@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Footer from '@/components/Footer';
 import NavBar from '@/components/NavBar';
 import { Outlet } from 'react-router-dom';
@@ -10,18 +9,17 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
 import { getTotals } from "@/store/cartSlice";
-
-const queryClient = new QueryClient();
+import { useCurrentUser } from '@/hooks/useAuth';
 
 function App() {
-  const [theme, setTheme]= useState(localStorage.getItem("preferredTheme") || "dark");
+  const [theme, setTheme] = useState(localStorage.getItem("preferredTheme") || "dark");
 
-  const changeTheme= ()=>{
-    const newTheme= theme==="dark"?"light":"dark";
+  const changeTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     if (theme === "dark") {
       document.querySelector("html").classList.add('dark');
     } else {
@@ -30,26 +28,32 @@ function App() {
     localStorage.setItem("preferredTheme", theme);
   }, [theme]);
 
-  const dispatch= useDispatch();
-  useEffect(()=>{
+  const dispatch = useDispatch();
+  useEffect(() => {
     dispatch(getTotals());
   })
 
-  const [user, setUser]= useState();
+  const [user, setUser] = useState();
+
+  // Restore user session from cookie on page load/refresh
+  const { data: currentUser } = useCurrentUser();
+  useEffect(() => {
+    if (currentUser !== undefined) {
+      setUser(currentUser);
+    }
+  }, [currentUser]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <UserProvider value={{user, setUser}}>
-        <ThemeProvider value={{theme, changeTheme}}>
-          <div className="flex flex-col justify-between min-h-screen dark:bg-gray-800 dark:border-gray-70">
-            <NavBar/>
-            <Outlet/>
-            <ToastContainer position="bottom-right" autoClose={2000} theme="colored"/>
-            <Footer/>
-          </div>
-        </ThemeProvider>
-      </UserProvider>
-    </QueryClientProvider>
+    <UserProvider value={{ user, setUser }}>
+      <ThemeProvider value={{ theme, changeTheme }}>
+        <div className="flex flex-col justify-between min-h-screen dark:bg-gray-800 dark:border-gray-70">
+          <NavBar />
+          <Outlet />
+          <ToastContainer position="bottom-right" autoClose={2000} theme="colored" />
+          <Footer />
+        </div>
+      </ThemeProvider>
+    </UserProvider>
   );
 }
 

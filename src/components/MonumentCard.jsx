@@ -40,10 +40,10 @@ export default function MonumentCard({ monument }) {
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-border/50 bg-card/50 backdrop-blur-sm group">
       <div className="relative aspect-[4/3] overflow-hidden">
-        <img 
-          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" 
-          src={image} 
-          alt={name} 
+        <img
+          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+          src={image}
+          alt={name}
         />
         <div className="absolute top-2 right-2">
           <Badge variant="secondary" className="font-semibold backdrop-blur-md bg-background/80">
@@ -52,8 +52,8 @@ export default function MonumentCard({ monument }) {
           </Badge>
         </div>
       </div>
-    
-      <CardHeader className="p-4 pb-2">
+
+      <CardHeader className="p-2 py-0">
         <CardTitle className="text-lg font-bold leading-tight line-clamp-1 group-hover:text-primary transition-colors">
           {name}
         </CardTitle>
@@ -62,9 +62,9 @@ export default function MonumentCard({ monument }) {
           <span className="line-clamp-1">{location}</span>
         </div>
       </CardHeader>
-      
-      <CardContent className="p-4 pt-0">
-        <div className="space-y-2 pt-2">
+
+      <CardContent className="p-2 py-0">
+        <div className="space-y-1">
           <div className="flex items-center justify-between">
             <label className="text-xs font-medium text-muted-foreground">Num. of Tickets</label>
             <Select onValueChange={handleQuantityChange} defaultValue="1">
@@ -83,8 +83,8 @@ export default function MonumentCard({ monument }) {
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0 gap-2">
-        <Button 
+      <CardFooter className="p-2 py-0 gap-2">
+        <Button
           className="flex-1 gap-2 shadow-sm"
           onClick={handleClick}
         >
