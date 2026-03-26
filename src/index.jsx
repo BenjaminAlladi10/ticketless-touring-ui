@@ -10,6 +10,7 @@ import LogIn from '@/pages/LogIn.jsx';
 import ErrorPage from '@/pages/ErrorPage.jsx';
 import Admin from '@/components/Admin/Admin.jsx';
 import PaymentForm from '@/pages/PaymentForm.jsx';
+import ProtectedRoute from '@/components/ProtectedRoute.jsx';
 
 import { Provider } from "react-redux";
 import appStore from '@/store/store.js';
@@ -47,7 +48,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/admin",
-        element: <Admin />
+        element: (
+          <ProtectedRoute requireAdmin={true}>
+            <Admin />
+          </ProtectedRoute>
+        )
       },
       {
 
