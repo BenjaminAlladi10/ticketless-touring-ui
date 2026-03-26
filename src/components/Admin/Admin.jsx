@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import Dashboard from './Dashboard';
+import Dashboard from '@/components/Admin/Dashboard';
 import {useDispatch, useSelector} from "react-redux";
-import { fetchMonuments } from '../../store/monumentsSlice';
+import { fetchMonuments } from '@/store/monumentsSlice';
 
-import AdminForm from './AdminForm';
+import AdminForm from '@/components/Admin/AdminForm';
 
 export default function Admin() {
   const [choice, setChoice]= useState("Add");

@@ -1,119 +1,194 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-
-import themeContext from '../contexts/themeContext.js';
-import { useEffect, useContext } from 'react';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoon } from '@fortawesome/free-solid-svg-icons';
+import React, { useEffect, useContext } from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Menu, ShoppingCart, Moon, Sun, LogOut, User, LayoutDashboard } from 'lucide-react';
 
-import userContext from '../contexts/userContext.js';
-import axios from 'axios';
-
-import userImg from '../assets/userImg.jpg';
+import themeContext from '@/contexts/themeContext';
+import userContext from '@/contexts/userContext';
+import { useLogout } from '@/hooks/useAuth';
+import userImg from '@/assets/userImg.jpg';
 import { toast } from 'react-toastify';
-import backend from '../constants.js';
+
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { Separator } from "@/components/ui/separator"
 
 export default function NavBar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, setUser } = useContext(userContext);
+  const { theme, changeTheme } = useContext(themeContext);
+  const logoutMutation = useLogout();
+  const cartItems = useSelector((state) => state.cart.cartItems);
 
-  const {user, setUser}= useContext(userContext);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const {changeTheme}= useContext(themeContext);
-
-  const cartItems= useSelector((state)=> state.cart.cartItems);
-
-  useEffect(()=>{
+  useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const handleLogout= async(e)=>{
-    const ans= prompt("Are you sure you want to log out");
+  const handleLogout = async () => {
+    const ans = window.confirm("Are you sure you want to log out?");
     if (ans) {
-      
       try {
-        const response= await axios.post(`${backend}/api/v1/users/logout`, {}, {
-          withCredentials: true
-        });
+        await logoutMutation.mutateAsync();
         setUser();
         toast.success("Logged out");
-      } 
+      }
       catch (error) {
         console.error(error);
         toast.error("Logout failed");
       }
-    } 
+    }
   };
 
+  const NavLinks = ({ className = "" }) => (
+    <div className={`flex items-center space-x-6 ${className}`}>
+      <NavLink to="/" className={({ isActive }) => 
+        `text-sm font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
+      }>
+        Home
+      </NavLink>
+      <NavLink to="/about" className={({ isActive }) => 
+        `text-sm font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
+      }>
+        About
+      </NavLink>
+      <NavLink to="/contact" className={({ isActive }) => 
+        `text-sm font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
+      }>
+        Contact
+      </NavLink>
+      {user?.isAdmin && (
+        <NavLink to="/admin" className={({ isActive }) => 
+          `text-sm font-medium transition-colors hover:text-primary flex items-center gap-1 ${isActive ? "text-primary" : "text-muted-foreground"}`
+        }>
+          <LayoutDashboard className="w-4 h-4" />
+          Admin
+        </NavLink>
+      )}
+    </div>
+  );
+
   return (
-    <nav className="bg-white border-gray-200 dark:bg-gray-900 shadow-md dark:shadow-none">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <img src="https://flowbite.com/docs/images/logo.svg" className="h-8" alt="Flowbite Logo" />
-          <span className="self-center md:text-2xl text-md font-semibold whitespace-nowrap dark:text-white">Ticketless Touring</span>
-        </Link>
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-md supports-[backdrop-filter]:bg-background/40">
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center gap-8">
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+              Ticketless Touring
+            </span>
+          </Link>
+          <nav className="hidden md:flex">
+            <NavLinks />
+          </nav>
+        </div>
 
-        <button 
-          data-collapse-toggle="navbar-default" 
-          type="button" 
-          className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" 
-          onClick={toggleMenu}>
-          <span className="sr-only">Open main menu</span>
-          <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1h15M1 7h15M1 13h15"/>
-          </svg>
-        </button>
-        
-        <div className={`${isMenuOpen ? 'block' : 'hidden'} w-full md:block md:w-auto`} id="navbar-default">
-          <ul className="font-medium flex flex-col items-center p-4 px-2 pr-0 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-            {user && user.isAdmin && <li>
-              <Link to="/admin" className="hidden md:block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Admin</Link>
-            </li>}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={changeTheme}
+            className="h-9 w-9"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5 transition-all" />
+            ) : (
+              <Moon className="h-5 w-5 transition-all" />
+            )}
+            <span className="sr-only">Toggle theme</span>
+          </Button>
 
-            <li>
-              <Link to="/" className="block py-2 px-3 text-black rounded md:bg-transparent hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
-                Home
+          <Link to="/cart">
+            <Button variant="ghost" size="icon" className="relative h-9 w-9">
+              <ShoppingCart className="h-5 w-5" />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  {cartItems.length}
+                </span>
+              )}
+              <span className="sr-only">Cart</span>
+            </Button>
+          </Link>
+
+          <Separator orientation="vertical" className="mx-2 h-6 hidden md:block" />
+
+          <div className="hidden md:flex items-center gap-4">
+            {user ? (
+              <div className="flex items-center gap-3">
+                <div className="flex flex-col items-end">
+                  <span className="text-sm font-medium leading-none">{user.username}</span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-[10px] text-muted-foreground hover:text-destructive flex items-center gap-1"
+                  >
+                    Logout <LogOut className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="h-8 w-8 rounded-full border overflow-hidden">
+                  <img src={userImg} alt={user.username} className="h-full w-full object-cover" />
+                </div>
+              </div>
+            ) : (
+              <Link to="/login">
+                <Button size="sm" className="px-5">Login</Button>
               </Link>
-            </li>
-            {false && <li>
-              <Link to="/about" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">About</Link>
-            </li>}
-            <li>
-              <Link to="/contact" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contact</Link>
-            </li>
-            <li>
-              <Link to="/about" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">About Us</Link>
-            </li>
-            <li>
-              <Link to="/cart" className="block relative py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
-                  <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
-                  </svg>
+            )}
+          </div>
 
-                  <span className="absolute -top-2 left-5 scale-95 font-semibold">{cartItems.length}</span>
-              </Link>
-            </li>
-            <li className="px-[0.4rem] py-[0.2rem] border-[1px] border-blue-600 border-solid bg-blue-600 active:scale-95">
-              {!user? (<Link to="/login" className="block p-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:p-0 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Login</Link>):
-              (<button className="block p-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:p-0 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent" onClick={handleLogout}>Logout</button>)}
-            </li>
-
-            <li className="dark:text-white cursor-pointer" onClick={changeTheme}>
-              <FontAwesomeIcon icon={faMoon} />
-            </li>
-
-            {user && <li to="/" className="py-2 pl-3 text-black flex flex-col items-center cursor-pointer rounded md:bg-transparent hover:text-blue-700 md:p-0 dark:text-white">
-                <img src={userImg} alt="user" className="w-8 rounded-[50%] mt-2"/>
-                <span className="text-xs font-sans">{user.username}</span>
-            </li>}
-          </ul>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetHeader>
+                <SheetTitle className="text-left">Menu</SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col gap-4 py-8">
+                <NavLink to="/" className={({ isActive }) => 
+                  `text-lg font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
+                }>Home</NavLink>
+                <NavLink to="/about" className={({ isActive }) => 
+                  `text-lg font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
+                }>About</NavLink>
+                <NavLink to="/contact" className={({ isActive }) => 
+                  `text-lg font-medium transition-colors hover:text-primary ${isActive ? "text-primary" : "text-muted-foreground"}`
+                }>Contact</NavLink>
+                {user?.isAdmin && (
+                  <NavLink to="/admin" className={({ isActive }) => 
+                    `text-lg font-medium transition-colors hover:text-primary flex items-center gap-2 ${isActive ? "text-primary" : "text-muted-foreground"}`
+                  }>
+                    <LayoutDashboard className="w-5 h-5" /> Admin Dashboard
+                  </NavLink>
+                )}
+                <Separator className="my-2" />
+                {user ? (
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full border overflow-hidden">
+                        <img src={userImg} alt={user.username} className="h-full w-full object-cover" />
+                      </div>
+                      <span className="font-medium">{user.username}</span>
+                    </div>
+                    <Button variant="outline" onClick={handleLogout} className="justify-start gap-2 text-destructive border-destructive/20 hover:bg-destructive/10">
+                      <LogOut className="w-4 h-4" /> Logout
+                    </Button>
+                  </div>
+                ) : (
+                  <Link to="/login">
+                    <Button className="w-full">Login</Button>
+                  </Link>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
-    </nav>
+    </header>
   );
 }

@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { BACKEND_URL } from '../constants/links';
+import { baseUrl } from '@/environments/index';
 
 const http = axios.create({
-  baseURL: `${BACKEND_URL}/api/v1`,
+  baseURL: baseUrl,
   withCredentials: true,
 });
 

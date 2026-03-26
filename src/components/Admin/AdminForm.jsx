@@ -1,22 +1,23 @@
 import React, { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import { Button } from "@/components/ui/button";
 import { toast } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchMonuments } from '../../store/monumentsSlice';
-import MonumentCard from '../MonumentCard';
-import userContext from '../../contexts/userContext';
-import backend from '../../constants.js';
+import { useDispatch } from 'react-redux';
+import MonumentCard from '@/components/MonumentCard';
+import userContext from '@/contexts/userContext';
+import { useMonuments, useAddMonument, useEditMonument, useDeleteMonument, useGetMonument } from '@/hooks/useMonuments';
+import { useUsers, useDeleteUser } from '@/hooks/useUsers';
 
-export default function AdminForm({choice}) {
+export default function AdminForm({ choice }) {
+    const { data: monuments = [] } = useMonuments();
+    const { data: users = [] } = useUsers();
+    const { user: loginUser } = useContext(userContext);
 
-    const monuments= useSelector((state)=> state.monuments.monuments);
+    const addMutation = useAddMonument();
+    const editMutation = useEditMonument();
+    const deleteMutation = useDeleteMonument();
+    const deleteUserMutation = useDeleteUser();
 
-    const dispatch= useDispatch();
-    useEffect(()=>{
-        dispatch(fetchMonuments());
-    }, []);
-
-    const [result, setResult]= useState(null);
+    const [result, setResult] = useState(null);
 
     const fields = [
         { type: "text", name: "name", label: "Name", required: true },
@@ -27,304 +28,211 @@ export default function AdminForm({choice}) {
         { type: "textarea", name: "description", label: "Description", required: true }
     ];
 
-    const [formData, setFormData]= useState({
+    const [formData, setFormData] = useState({
         name: '',
         location: '',
-        image: '', // for file uploads
+        image: '',
         price: '',
         category: '',
         description: '',
         selectedMonument: ''
     });
 
-    const handleInputChange= (e)=>{
-        const {name, value}= e.target;
+    useEffect(() => {
+        if (monuments.length > 0 && !formData.selectedMonument) {
+            setFormData((prevData) => ({
+                ...prevData,
+                selectedMonument: monuments[0]._id
+            }));
+        }
+    }, [monuments, formData.selectedMonument]);
 
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
         setFormData({
             ...formData,
             [name]: value
         });
     };
 
-    const handleFileChange= (e)=>{
-        setFormData((prev)=> (
-            {
-                ...prev,
-                image: e.target.files[0]
-            }
-        ))
+    const handleFileChange = (e) => {
+        setFormData((prev) => ({
+            ...prev,
+            image: e.target.files[0]
+        }));
     };
 
-    const handleSubmit= async(e)=>{
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const data= new FormData();
-        if (choice === 'Add') 
-        {
-            data.append('name', formData.name);
-            data.append('location', formData.location);
-            data.append('image', formData.image); // The file
-            data.append('price', formData.price);
-            data.append('category', formData.category);
-            data.append('description', formData.description);
-            
-            try {
-                const response = await axios.post(`${backend}/api/v1/monuments/addmonument`, data, {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    },
-                    withCredentials: true
-                });
+        const data = new FormData();
+        try {
+            let res;
+            if (choice === 'Add') {
+                data.append('name', formData.name);
+                data.append('location', formData.location);
+                data.append('image', formData.image);
+                data.append('price', formData.price);
+                data.append('category', formData.category);
+                data.append('description', formData.description);
 
-                setResult(response.data.data);
-                toast.success(response.data.statusMessage);
-            } 
-            catch (error) {
-                console.error(error.response.data.message);
-                toast.error(error.response.data.message);
+                res = await addMutation.mutateAsync(data);
             }
-        } 
-        else if (choice === 'Edit') 
-        {
-            data.append("_id", formData.selectedMonument);
-            data.append('name', formData.name);
-            data.append('location', formData.location);
-            data.append('image', formData.image); // The file
-            data.append('price', formData.price);
-            data.append('category', formData.category);
-            data.append('description', formData.description);
+            else if (choice === 'Edit') {
+                data.append("_id", formData.selectedMonument);
+                data.append('name', formData.name);
+                data.append('location', formData.location);
+                data.append('image', formData.image);
+                data.append('price', formData.price);
+                data.append('category', formData.category);
+                data.append('description', formData.description);
 
-            try {
-                const response = await axios.patch(`${backend}/api/v1/monuments/editmonument`, data, {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    },
-                    withCredentials: true
-                });
-
-                setResult(response.data.data); 
-                toast.success(response.data.statusMessage);
-            } 
-            catch (error) {
-                console.error(error.response.data.statusMessage);  
-                toast.error(error.response.data.statusMessage);
+                res = await editMutation.mutateAsync(data);
             }
-        } 
-        else if (choice === 'Delete') 
-        {
-            data.append("_id", formData.selectedMonument);
-
-            try {
-                const response = await axios.post(`${backend}/api/v1/monuments/deletemonument`, {
-                    _id: formData.selectedMonument 
-                },{
-                    withCredentials: true
-                  });
-
-                setResult(response.data.data);
-                toast.success(response.data.statusMessage);  
-            } 
-            catch (error) {
-                console.error(error.response.data.message);  
-                toast.error(error.response.data.message);
+            else if (choice === 'Delete') {
+                res = await deleteMutation.mutateAsync(formData.selectedMonument);
             }
-        } 
-        else if (choice === 'Get') 
-        {
-            data.append("_id", formData.selectedMonument);
+            else if (choice === 'Get') {
+                // For Get, we still use a direct call or a one-off query, but since it's a form submit, mutateAsync is fine if we want, 
+                // but we should probably just fetch it. However, the original code used http.post for Get.
+                // I'll stick to a direct http call for one-off searches if they don't benefit from caching.
+                const response = await http.post("/monuments/getmonument", { _id: formData.selectedMonument });
+                res = response.data;
+            }
 
-            try {
-                const response = await axios.post(`${backend}/api/v1/monuments/getmonument`, {
-                    _id: formData.selectedMonument
-                },{
-                    withCredentials: true
-                  });
-
-                setResult(response.data.data);
-                toast.success(response.data.statusMessage);  
-            } 
-            catch (error) {
-                console.error(error.response.data.message); 
-                toast.error(error.response.data.message); 
+            if (res) {
+                setResult(res.data);
+                toast.success(res.statusMessage || "Success");
             }
         }
-        else if(choice==="All Users")
-        {
-            try {
-                const response = await axios.get(`${backend}/api/v1/users/getallusers`, {
-                    withCredentials: true
-                  });
-
-                setResult(response.data.data);
-                toast.success(response.data.statusMessage);  
-            } 
-            catch (error) {
-                console.error(error.response.data.message); 
-                toast.error(error.response.data.message); 
-            }
-        }
-        else
-        {
-            toast.error("Invalid request");
-            return;
+        catch (error) {
+            const errorMsg = error.response?.data?.message || error.response?.data?.statusMessage || "Request failed";
+            toast.error(errorMsg);
         }
 
         setFormData({
+            ...formData,
             name: '',
             location: '',
             image: '',
             price: '',
             category: '',
             description: '',
-            selectedMonument: ''
         });
-
-        dispatch(fetchMonuments());
     }
 
-    useEffect(() => {
-        if (monuments.length > 0) {
-          setFormData((prevData) => ({
-            ...prevData,
-            selectedMonument: monuments[0]._id
-          }));
-        }
-      }, []);
-
-    const {user:loginUser}= useContext(userContext);
-
-    const handleDelete= async(user)=>{
+    const handleDeleteUser = async (user) => {
         try {
-            const response= await axios.post(`${backend}/api/v1/users/deleteuser`, {
-                _id: user._id
-            });
-
-            toast.success(response.data.data.username +": "+ response.data.statusMessage);
-            setResult((prevUsers) => prevUsers.filter(pUser => pUser._id !== user._id));
-        } 
+            const res = await deleteUserMutation.mutateAsync(user._id);
+            toast.success(res.data.username + ": " + res.statusMessage);
+        }
         catch (error) {
-            toast.error(error.response.data.message); 
+            toast.error(error.response?.data?.message || "Delete failed");
         }
     }
-      
-  return (
-    <div className='mt-2 mx-auto'>
-        <h1 className='md:text-2xl text-lg'>
-            {choice} {(choice==="Get All")?"Monuments": choice==="All Users"?"":"Monument"}
-        </h1>
 
-        <form className="grid grid-cols-1 mt-2 gap-y-3 sm:grid-cols-2 sm:gap-x-8" onSubmit={handleSubmit}>
-            {(choice==="Edit" || choice==="Delete" || choice==="Get") &&
-                <div className="sm:col-span-2">
-                    <label htmlFor="pName" className="block text-sm font-medium text-gray-700 dark:text-slate-400">Select</label>
-                    
-                    <div className="mt-1">
-                        <select required value={formData.selectedMonument} onChange={handleInputChange} name="selectedMonument" id="pName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                            {monuments &&
-                                monuments.map((monument, ind)=>
-                                <option value={monument._id} key={ind}>
-                                    {monument.name}
-                                </option>)
-                            }
-                        </select>
-                    </div>
-                </div>    
-            }
+    return (
+        <div className='mt-2 mx-auto w-full max-w-4xl'>
+            <h1 className='text-xl md:text-2xl font-bold mb-4 dark:text-white'>
+                {choice} {(choice === "Get All") ? "Monuments" : choice === "All Users" ? "" : "Monument"}
+            </h1>
 
-            {(choice==="Add" || choice==="Edit") &&
-                fields.map((field, ind)=>{
-                    return (
-                        <div className="sm:col-span-2" key={ind}>
-                            <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 dark:text-slate-400">{field.label}</label>
-
-                            <div className="mt-1">
-                                {
-                                    field.type==="textarea"?(
-                                        <textarea value={formData[field.name]} onChange={handleInputChange} required={!(choice==="Edit")} name={field.name} id={field.name} rows="2" cols="35" className="border border-gray-300 outline-none block w-full rounded-md py-3 px-4 shadow-sm focus:border-sky-500 focus:ring-sky-500 dark:border-white/5 dark:bg-slate-700/50 dark:text-white">
-                                        </textarea>
-                                    ):(
-                                        field.type!=="file"?(
-                                        <input name={field.name} value={formData[field.name]} onChange={handleInputChange} type={field.type} id={field.name}  required={!(choice==="Edit")} className="border border-gray-300 outline-none block w-full rounded-md py-2 px-3 shadow-sm focus:border-sky-500 focus:ring-sky-500 dark:border-white/5 dark:bg-slate-700/50 dark:text-white"/> 
-                                        ):(
-                                            <input type={field.type} id={field.name} name={field.name} onChange={handleFileChange} className="border border-gray-300 outline-none block w-full rounded-md py-2 px-3 shadow-sm focus:border-sky-500 focus:ring-sky-500 dark:border-white/5 dark:bg-slate-700/50 dark:text-white"/>
-                                        )
-                                    )
-                                }
-
-                            </div>
+            {choice !== "All Users" && (
+                <form className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-8 mb-8" onSubmit={handleSubmit}>
+                    {(choice === "Edit" || choice === "Delete" || choice === "Get") &&
+                        <div className="sm:col-span-2">
+                            <label htmlFor="selectedMonument" className="block text-sm font-medium text-gray-700 dark:text-slate-400 mb-1">Select Monument</label>
+                            <select
+                                required
+                                value={formData.selectedMonument}
+                                onChange={handleInputChange}
+                                name="selectedMonument"
+                                id="selectedMonument"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            >
+                                {monuments.map((monument) => (
+                                    <option value={monument._id} key={monument._id}>
+                                        {monument.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
-                    )
-                })
-            }
+                    }
 
-            <div className="flex justify-start flex-wrap sm:col-span-2 mb-4">
-                <button type="submit" className="inline-flex items-center rounded-md px-4 py-2 font-medium focus:outline-none focus-visible:ring focus-visible:ring-sky-500 shadow-sm sm:text-sm transition-colors duration-75 text-sky-500 border border-sky-500 hover:bg-sky-50 active:bg-sky-100 disabled:bg-sky-100 dark:hover:bg-gray-900 dark:active:bg-gray-800 dark:disabled:bg-gray-800 disabled:cursor-not-allowed">
-                    <span>Submit</span>
-                </button>
-            </div> 
+                    {(choice === "Add" || choice === "Edit") &&
+                        fields.map((field, ind) => (
+                            <div className="sm:col-span-2" key={ind}>
+                                <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 dark:text-slate-400 mb-1">{field.label}</label>
+                                {field.type === "textarea" ? (
+                                    <textarea
+                                        value={formData[field.name]}
+                                        onChange={handleInputChange}
+                                        required={choice === "Add"}
+                                        name={field.name}
+                                        id={field.name}
+                                        rows="3"
+                                        className="w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm focus:ring-2 focus:ring-sky-500 dark:bg-slate-700 dark:border-white/10 dark:text-white"
+                                    />
+                                ) : (
+                                    <input
+                                        name={field.name}
+                                        value={field.type === "file" ? undefined : formData[field.name]}
+                                        onChange={field.type === "file" ? handleFileChange : handleInputChange}
+                                        type={field.type}
+                                        id={field.name}
+                                        required={choice === "Add" && field.type !== "file"}
+                                        className="w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm focus:ring-2 focus:ring-sky-500 dark:bg-slate-700 dark:border-white/10 dark:text-white"
+                                    />
+                                )}
+                            </div>
+                        ))
+                    }
 
-        </form>
+                    <div className="sm:col-span-2">
+                        <Button type="submit" className="w-full sm:w-auto">
+                            Submit
+                        </Button>
+                    </div>
+                </form>
+            )}
 
-        {
-            result && choice==="Get" && 
-            <MonumentCard monument={result}/>
-        }
+            {result && choice === "Get" && <MonumentCard monument={result} />}
 
-        {
-            result && choice==="Get All" &&
-            <h1>Get All</h1>
-        }
-
-        {
-            result && choice==="All Users" &&
-            
-            <div className="relative mx-auto p-0 mt-4 mb-4">
-                <table className="w-[90%] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" className="px-4 py-2">
-                                username
-                            </th>
-                            <th scope="col" className="px-4 py-2">
-                                email
-                            </th>
-                            <th scope="col" className="px-4 py-2 ">
-                                created at
-                            </th>
-                            <th scope="col" className="px-4 py-2 ">
-                                updated at
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {
-                            result.map((user, ind)=>(
-                                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700" key={ind}>
-                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        {user.username} {loginUser.username===user.username? "(you)":""}
+            {choice === "All Users" && (
+                <div className="overflow-x-auto mt-4 mb-4">
+                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" className="px-4 py-3">Username</th>
+                                <th scope="col" className="px-4 py-3">Email</th>
+                                <th scope="col" className="px-4 py-3">Created At</th>
+                                <th scope="col" className="px-4 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {users.map((user) => (
+                                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700" key={user._id}>
+                                    <th scope="row" className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {user.username} {loginUser?.username === user.username ? "(you)" : ""}
                                     </th>
-                                    <td className="px-4 py-2">
-                                        {user.email}
-                                    </td>
-                                    <td className="px-4 py-2 ">
-                                        {user.createdAt}
-                                    </td>
-                                    <td className="px-4 py-2 ">
-                                        {user.updatedAt}
-                                    </td>
-                                    <td>
-                                       <button className="bg-red-600 px-2 py-1 ml-4 rounded-md text-white hover:shadow-md active:scale-95" onClick={()=>handleDelete(user)}>
+                                    <td className="px-4 py-4">{user.email}</td>
+                                    <td className="px-4 py-4">{new Date(user.createdAt).toLocaleDateString()}</td>
+                                    <td className="px-4 py-4">
+                                        <Button 
+                                            variant="destructive" 
+                                            size="sm" 
+                                            onClick={() => handleDeleteUser(user)}
+                                            disabled={loginUser?.username === user.username}
+                                        >
                                             Delete
-                                       </button>
+                                        </Button>
                                     </td>
-                                </tr> 
-                            ))
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-    </div>
-  )
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </div>
+    )
 }
