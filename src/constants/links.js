@@ -1,5 +1,3 @@
-export const BACKEND_URL = "https://touring.onrender.com";
-
 export const SOCIAL_LINKS = {
   GITHUB_API: "https://api.github.com/users/BenjaminAlladi10",
   LINKEDIN: "https://www.linkedin.com/in/benjamin-alladi-383511223/",

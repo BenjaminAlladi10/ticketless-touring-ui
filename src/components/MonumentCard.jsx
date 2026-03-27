@@ -38,7 +38,7 @@ export default function MonumentCard({ monument }) {
   };
 
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-border/50 bg-card/50 backdrop-blur-sm group">
+    <Card className="w-full h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-border/50 bg-card/50 backdrop-blur-sm group flex flex-col">
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
           className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
