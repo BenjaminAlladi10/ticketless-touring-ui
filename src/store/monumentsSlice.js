@@ -6,7 +6,7 @@ export const fetchMonuments = createAsyncThunk("monuments/fetchMonuments", async
         const response = await http.get("/monuments/getallmonuments");
         return response.data.data;
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 });
 

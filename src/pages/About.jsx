@@ -4,7 +4,8 @@ import { useGithubProfile } from '@/hooks/useGithubProfile';
 import profile from "@/assets/userImg.jpg";
 import { Github, Linkedin, ExternalLink, User, Code, Globe, Info } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -70,16 +71,22 @@ export default function About() {
                 </CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" className="gap-2" asChild>
-                  <a href={githubUser.html_url} target="_blank" rel="noopener noreferrer">
-                    <Github className="w-4 h-4" /> GitHub
-                  </a>
-                </Button>
-                <Button size="sm" className="gap-2 transition-all hover:translate-y-[-2px]" asChild>
-                  <a href={SOCIAL_LINKS.LINKEDIN} target="_blank" rel="noopener noreferrer">
-                    <Linkedin className="w-4 h-4" /> LinkedIn
-                  </a>
-                </Button>
+                <a
+                  href={githubUser.html_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(buttonVariants({ size: "sm", variant: "outline" }), "flex items-center gap-2")}
+                >
+                  <Github className="w-4 h-4" /> GitHub
+                </a>
+                <a
+                  href={SOCIAL_LINKS.LINKEDIN}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(buttonVariants({ size: "sm" }), "flex items-center gap-2 transition-all hover:translate-y-[-2px]")}
+                >
+                  <Linkedin className="w-4 h-4" /> LinkedIn
+                </a>
               </div>
             </div>
           </CardHeader>
@@ -99,7 +106,7 @@ export default function About() {
                 </p>
               </div>
             </div>
-            
+
             <div className="pt-4 border-t border-border/50">
               <p className="text-sm text-center italic text-muted-foreground">
                 "Preserving the past, coding the future."

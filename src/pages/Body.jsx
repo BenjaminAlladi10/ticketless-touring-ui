@@ -4,6 +4,7 @@ import { useMonuments } from '@/hooks/useMonuments';
 import ShimmerContainer from '@/components/ShimmerContainer';
 import { Search, Map, Calendar, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { steps } from '@/constants/constants';
 
 export default function Body() {
   const { data: monuments, isLoading, isError, error } = useMonuments();
@@ -55,13 +56,48 @@ export default function Body() {
             ticketless touring platform. Instant booking, zero hassle.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Button size="lg" className="h-12 gap-2 text-base px-8 shadow-lg shadow-primary/20">
+            <Button
+              size="lg"
+              className="h-12 gap-2 text-base px-8 shadow-lg shadow-primary/20"
+              onClick={() => document.getElementById('monuments')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               Explore Destinations <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button size="lg" variant="outline" className="h-12 gap-2 text-base px-8 border-white/20 bg-white/10">
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-12 gap-2 text-base px-8 border-white/20 bg-white/10 hover:bg-white/20"
+              onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               How it Works
             </Button>
           </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="container px-4 md:px-6 py-12">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold tracking-tight mb-4">How It Works</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Get your monument tickets in three simple steps. No more waiting in long physical queues.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {steps.map((item, index) => (
+            <div key={index} className="relative p-6 rounded-2xl border border-border bg-card/50 hover:shadow-xl transition-all duration-300 group">
+              <div className="absolute -top-4 -right-4 text-6xl font-black text-primary/5 select-none transition-colors group-hover:text-primary/10">
+                {item.step}
+              </div>
+              <div className="mb-4 inline-flex p-3 rounded-xl bg-primary/10 transition-transform group-hover:scale-110">
+                {item.iconName === "Map" && <Map className="h-10 w-10 text-primary" />}
+                {item.iconName === "Calendar" && <Calendar className="h-10 w-10 text-primary" />}
+                {item.iconName === "Search" && <Search className="h-10 w-10 text-primary" />}
+              </div>
+              <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+              <p className="text-muted-foreground">{item.description}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -87,7 +123,7 @@ export default function Body() {
         {isLoading ? (
           <ShimmerContainer />
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-items-center">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredMonuments?.length > 0 ? (
               filteredMonuments.map((monument) => (
                 <MonumentCard monument={monument} key={monument._id} />
