@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { LogIn as LogInIcon, UserPlus, Mail, Lock, User, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { LogIn as LogInIcon, UserPlus, Mail, Lock, User, CheckCircle2 } from 'lucide-react';
 
 import userContext from '@/contexts/userContext';
 import { useLogin, useRegister } from '@/hooks/useAuth';
-import loginHero from '@/assets/login-hero.png';
+import AuthHeroPanel from '@/components/AuthHeroPanel.jsx';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -92,28 +92,8 @@ export default function LogIn() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left Side - Image & Branding */}
-      <div className="relative hidden w-0 flex-1 lg:block">
-        <img
-          className="absolute inset-0 h-full w-full object-cover"
-          src={loginHero}
-          alt="Taj Mahal at sunset"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-        <div className="absolute bottom-12 left-12 right-12 space-y-4 text-white">
-          <Link to="/" className="flex items-center gap-2 text-white/80 hover:text-white transition-colors mb-8">
-            <ArrowLeft className="w-5 h-5" /> Back to explore
-          </Link>
-          <h1 className="text-5xl font-black tracking-tighter">
-            Rediscover <br />
-            <span className="text-primary italic">Heritage.</span>
-          </h1>
-          <p className="max-w-md text-lg text-white/70">
-            Secure your journey to India's most iconic landmarks with our seamless digital ticketing experience.
-          </p>
-        </div>
-      </div>
+    <div className="flex h-screen">
+      <AuthHeroPanel />
 
       {/* Right Side - Forms */}
       <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-32 bg-background">
@@ -170,9 +150,9 @@ export default function LogIn() {
                   <div className="grid gap-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="password">Password</Label>
-                      <button type="button" className="text-xs font-medium text-primary hover:underline">
+                      <Link to="/forgot-password" className="text-xs font-medium text-primary hover:underline">
                         Forgot password?
-                      </button>
+                      </Link>
                     </div>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />

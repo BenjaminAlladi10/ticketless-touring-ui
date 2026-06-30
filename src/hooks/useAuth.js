@@ -47,3 +47,22 @@ export const useLogout = () => {
     }
   });
 };
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: async ({ email }) => {
+      const response = await http.post('/users/forgot-password', { email });
+      return response.data;
+    },
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: async ({ token, password }) => {
+      const response = await http.post(`/users/reset-password/${token}`, { password });
+      return response.data;
+    },
+  });
+};
+
