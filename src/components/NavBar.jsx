@@ -77,7 +77,7 @@ export default function NavBar() {
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center space-x-2">
             <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
-              Ticketless Touring
+              Heritage Pass
             </span>
           </Link>
           <nav className="hidden md:flex">

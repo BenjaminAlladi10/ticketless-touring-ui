@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { Lock, Eye, EyeOff, CheckCircle2, ArrowLeft, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useResetPassword } from '@/hooks/useAuth';
 import AuthHeroPanel from '@/components/AuthHeroPanel.jsx';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,36 +78,45 @@ export default function ResetPassword() {
 
       {/* Right Side */}
       <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-32 bg-background overflow-y-auto">
-        <div className="mx-auto w-full max-w-sm lg:w-96">
+        <motion.div
+          className="mx-auto w-full max-w-sm lg:w-96"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+        >
 
           {/* Back to login — above the card */}
           <Link
             to="/login"
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Login
           </Link>
 
+          <AnimatePresence mode="wait">
           {/* No token */}
           {!token ? (
-            <Card className="border-destructive/50 bg-destructive/5 backdrop-blur-sm p-6 text-center animate-in fade-in duration-300">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <motion.div key="no-token" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: 'easeOut' }}>
+            <Card className="border-destructive/50 bg-destructive/5 backdrop-blur-sm p-6 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
                 <AlertCircle className="h-6 w-6" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Invalid Request</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <h3 className="text-lg font-semibold mb-1">Invalid Request</h3>
+              <p className="text-sm text-muted-foreground mb-2">
                 No reset token found. Please click the link in your email, or request a new one.
               </p>
               <Button onClick={() => navigate('/forgot-password')} className="w-full">
                 Go to Forgot Password
               </Button>
             </Card>
+            </motion.div>
 
-          /* Success state */
+            /* Success state */
           ) : submitted ? (
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-xl p-4 text-center animate-in fade-in zoom-in-95 duration-300">
+            <motion.div key="success" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: 'easeOut' }}>
+            <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-xl p-4 text-center">
               <CardHeader className="pb-2">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
+                <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
                   <ShieldCheck className="h-8 w-8 text-green-500" />
                 </div>
                 <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
@@ -122,18 +132,20 @@ export default function ResetPassword() {
                 </Button>
               </CardFooter>
             </Card>
+            </motion.div>
 
-          /* Reset form */
+            /* Reset form */
           ) : (
+            <motion.div key="form" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: 'easeOut' }}>
             <>
-              <div className="mb-8">
+              <div className="mb-5">
                 <h2 className="text-3xl font-bold tracking-tight">Reset Password</h2>
                 <p className="mt-2 text-sm text-muted-foreground">Enter your new password below.</p>
               </div>
 
               <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <form onSubmit={handleSubmit}>
-                  <CardContent className="pt-6 space-y-5">
+                  <CardContent className="pt-4 space-y-5">
                     {/* New Password */}
                     <div className="grid gap-2">
                       <Label htmlFor="password">New Password</Label>
@@ -163,10 +175,9 @@ export default function ResetPassword() {
                       <div className="space-y-1.5">
                         <div className="flex justify-between text-xs">
                           <span className="text-muted-foreground">Password Strength</span>
-                          <span className={`font-semibold ${
-                            strength.label === 'Strong' ? 'text-emerald-500' :
+                          <span className={`font-semibold ${strength.label === 'Strong' ? 'text-emerald-500' :
                             strength.label === 'Medium' ? 'text-amber-500' : 'text-red-500'
-                          }`}>{strength.label}</span>
+                            }`}>{strength.label}</span>
                         </div>
                         <div className="h-1.5 w-full bg-muted/40 rounded-full overflow-hidden">
                           <div className={`h-full transition-all duration-300 ${strength.color} ${strength.width}`} />
@@ -199,7 +210,7 @@ export default function ResetPassword() {
                     </div>
                   </CardContent>
 
-                  <CardFooter className="pt-2 pb-6">
+                  <CardFooter className="pt-1 pb-4">
                     <Button
                       type="submit"
                       className="w-full h-11 text-base font-bold shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
@@ -215,8 +226,10 @@ export default function ResetPassword() {
                 </form>
               </Card>
             </>
+            </motion.div>
           )}
-        </div>
+          </AnimatePresence>
+        </motion.div>
       </div>
     </div>
   );

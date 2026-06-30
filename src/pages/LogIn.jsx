@@ -6,6 +6,7 @@ import { LogIn as LogInIcon, UserPlus, Mail, Lock, User, CheckCircle2 } from 'lu
 import userContext from '@/contexts/userContext';
 import { useLogin, useRegister } from '@/hooks/useAuth';
 import AuthHeroPanel from '@/components/AuthHeroPanel.jsx';
+import { motion } from 'framer-motion';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -97,7 +98,12 @@ export default function LogIn() {
 
       {/* Right Side - Forms */}
       <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-32 bg-background">
-        <div className="mx-auto w-full max-w-sm lg:w-96">
+        <motion.div
+          className="mx-auto w-full max-w-sm lg:w-96"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+        >
           <div className="text-center lg:text-left mb-10">
             <h2 className="text-3xl font-bold tracking-tight">
               {activeTab === "login" ? "Welcome Back" : "Start Your Journey"}
@@ -247,7 +253,7 @@ export default function LogIn() {
               </form>
             </TabsContent>
           </Tabs>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

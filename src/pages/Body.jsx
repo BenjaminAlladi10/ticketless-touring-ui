@@ -52,8 +52,7 @@ export default function Body() {
             </span>
           </h1>
           <p className="mb-10 max-w-2xl text-lg text-slate-300 md:text-xl">
-            Skip the long queues and experience India's rich history with our seamless,
-            ticketless touring platform. Instant booking, zero hassle.
+            Discover India's rich history with Heritage Pass — skip the queues and book tickets to iconic monuments instantly, zero hassle.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Button
@@ -125,8 +124,8 @@ export default function Body() {
         ) : (
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredMonuments?.length > 0 ? (
-              filteredMonuments.map((monument) => (
-                <MonumentCard monument={monument} key={monument._id} />
+              filteredMonuments.map((monument, index) => (
+                <MonumentCard monument={monument} index={index} key={monument._id} />
               ))
             ) : (
               <div className="col-span-full py-10 text-center">
